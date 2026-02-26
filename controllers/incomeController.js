@@ -55,11 +55,13 @@ const downloadIncomeExcel = async (req, res) => {
     try {
         const income = await Income.find({ userId }).sort({ date: -1 });
 
-        const data = income.map((item) => ({
+        const data = expense.map((item) => ({
             Icon: item.icon,
-            Source: item.source,
+            Category: item.cateory,
             Amount: item.amount,
-            Date: item.date,
+            Date: new Date(item.date).toLocaleDateString('en-US', { 
+                month: 'short', day: 'numeric', year: 'numeric' 
+            }),
         }));
 
         const wb = xlsx.utils.book_new();
