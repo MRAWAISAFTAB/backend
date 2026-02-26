@@ -4,12 +4,12 @@ const Expense = require("../models/Expense");
 
 //  Add Expense Source
 const addExpense = async (req, res) => {
-    const userId = req.user._id  // ✅ fixed: was req.user.id
+    const userId = req.user._id
 
     try {
-        const { icon, cateory, amount, date } = req.body;  // ✅ fixed: removed source, added amount
+        const { icon, cateory, amount, date } = req.body;
 
-        if (!cateory || !amount) {  // ✅ fixed: correct validation
+        if (!cateory || !amount) {
             return res.status(400).json({ message: "All fields are required" })
         }
 
@@ -31,7 +31,7 @@ const addExpense = async (req, res) => {
 
 //  Get All Expense
 const getAllExpense = async (req, res) => {
-    const userId = req.user._id;  // ✅ fixed
+    const userId = req.user._id;
 
     try {
         const expense = await Expense.find({ userId }).sort({ date: -1 });
@@ -53,7 +53,7 @@ const deleteExpense = async (req, res) => {
 }
 
 const downloadExpenseExcel = async (req, res) => {
-    const userId = req.user._id;  // ✅ fixed
+    const userId = req.user._id;
     try {
         const expense = await Expense.find({ userId }).sort({ date: -1 });
 
@@ -67,8 +67,13 @@ const downloadExpenseExcel = async (req, res) => {
         const wb = xlsx.utils.book_new();
         const ws = xlsx.utils.json_to_sheet(data);
         xlsx.utils.book_append_sheet(wb, ws, "Expense");
-        xlsx.writeFile(wb, "expense_details.xlsx");
-        res.download("expense_details.xlsx");
+
+        // ✅ Buffer use karo — Vercel pe file system nahi hota
+        const buffer = xlsx.write(wb, { type: "buffer", bookType: "xlsx" });
+
+        res.setHeader("Content-Disposition", "attachment; filename=expenses.xlsx");
+        res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        res.send(buffer);
     } catch (error) {
         console.log(error);
         res.status(500).json({ message: "Server Error" });
