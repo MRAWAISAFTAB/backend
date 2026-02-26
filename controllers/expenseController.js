@@ -61,9 +61,7 @@ const downloadExpenseExcel = async (req, res) => {
             Icon: item.icon,
             Category: item.cateory,
             Amount: item.amount,
-            Date: new Date(item.date).toLocaleDateString('en-US', { 
-                month: 'short', day: 'numeric', year: 'numeric' 
-            }),
+            Date: item.date,
         }));
 
         const wb = xlsx.utils.book_new();
